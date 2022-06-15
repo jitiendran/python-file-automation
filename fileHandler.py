@@ -20,7 +20,7 @@ def makeUniquePath(destination, name):
     filename, extension = splitext(name)
     counter = 1
     while exists(join(destination, name)):
-        name = f"{filename} ({counter}{extension})"
+        name = f"{filename} ({counter}){extension}"
         counter += 1
     return name
 
