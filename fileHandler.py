@@ -1,5 +1,5 @@
-from os import scandir, rename
-from os.path import splitext, exists
+from os import makedirs, scandir, rename
+from os.path import splitext, exists, join
 from shutil import move
 from watchdog.events import FileSystemEventHandler as fileEventHandler
 import logging
@@ -16,20 +16,22 @@ audioExtensions = [".m4a", ".flac", "mp3", ".wav", ".wma", ".aac"]
 documentExtensions = [".doc", ".docx", ".odt", ".pdf", ".xls", ".xlsx", ".ppt", ".pptx"]
 
 # If the filename already exist then add number to end of file
-def makeUniquePath(path):
-    filename, extension = splitext(path)
+def makeUniquePath(destination, name):
+    filename, extension = splitext(name)
     counter = 1
-    while exists(path):
-        path = f"{filename} ({counter}{extension})"
+    while exists(join(destination, name)):
+        name = f"{filename} ({counter}{extension})"
         counter += 1
-    return path
+    return name
 
 # Moving file to the destinated location
 def moveFile(destination, entry, filename):
     if exists(f"{destination}/{filename}"):
-        uniqueName = makeUniquePath(filename)
-        rename(entry, uniqueName)
-    move(entry, destination)
+        uniqueName = makeUniquePath(destination, filename)
+        rename(entry, join(destination, uniqueName))
+    else:
+        makedirs(destination)
+    move(entry, join(destination, filename))
 
 class FileHandler(fileEventHandler):
     # Pre-built function to monitor realtime changes to the directory
